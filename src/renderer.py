@@ -31,9 +31,9 @@ class Renderer:
         multiplied_vertex_vectors = np.matmul(vertex_vectors.T, np.diag(np.array(multiplier)))
         transformed_vertices = self.scene.vertices.T - multiplied_vertex_vectors
 
-        print(transformed_vertices)
 
-        self.render(width, height, transformed_vertices)
+        self.render(width, height, transformed_vertices.T)
+
 
         # char = next(self.seq)
 
