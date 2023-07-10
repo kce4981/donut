@@ -1,6 +1,6 @@
 import numpy as np
 
-class cube:
+class Cube:
     def __init__(self):
         temp = []
         temp.append([10, 10, 10])
