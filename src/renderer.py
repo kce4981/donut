@@ -31,8 +31,13 @@ class Renderer:
         multiplied_vertex_vectors = np.matmul(vertex_vectors.T, np.diag(np.array(multiplier)))
         transformed_vertices = self.scene.vertices.T - multiplied_vertex_vectors
 
+        # i found a critical error while experimenting with different y values
+        # this projection method projects the entire plane 
+        # meaning not only the front, the back of the camera also will be projected
+        # very good logic i have
 
         self.render(width, height, transformed_vertices.T)
+        self.scene.tick()
 
 
         # char = next(self.seq)
@@ -48,12 +53,15 @@ class Renderer:
         screen = [[" " for _ in range(width)] for _ in range(height)]
 
         for ver in vertices:
-            w = round(ver[0])
-            h = round(ver[2])
-
-            if w < 0 or w > width:
+            try:
+                w = round(ver[0])
+                h = round(ver[2])
+            except OverflowError:
                 continue
-            if h < 0 or h > height:
+
+            if w < 0 or w >= width:
+                continue
+            if h < 0 or h >= height:
                 continue
 
             screen[h][w] = "@"
