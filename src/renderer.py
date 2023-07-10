@@ -3,16 +3,17 @@ import sys
 import time
 import itertools
 import numpy as np
+from src.scenes import Base
 
 class Renderer:
-    def __init__(self, scene):
+    def __init__(self, scene: Base):
         self.scene = scene
         self.seq = itertools.cycle(["@", "."])
     
     def tick(self):
         width, height = shutil.get_terminal_size()
 
-        camera_point = np.array((round(width/2), -10, round(height/2)))
+        camera_point = np.array((round(width/2), -30, round(height/2)))
         vertex_vectors = self.scene.vertices - camera_point
         
         multiplier = []
@@ -73,8 +74,12 @@ class Renderer:
 
     def run(self):
         while(True):
-            self.tick()
-            time.sleep(0.1)
+            try:
+                self.tick()
+                time.sleep(0.1)
+            except:
+                self.scene.quit()
+                break
 
 
 if __name__ == '__main__':
