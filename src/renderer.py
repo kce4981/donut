@@ -6,11 +6,15 @@ import numpy as np
 from src.scenes import Base
 
 class Renderer:
-    def __init__(self, scene: Base):
+    def __init__(self, scene: Base, dump=False):
         self.scene = scene
         self.seq = itertools.cycle(["@", "."])
         self.payload = []
+        self.dump = dump
         self.count = 0
+
+
+        self.scene.dump = self.dump
     
     def tick(self):
         width, height = shutil.get_terminal_size()
@@ -43,6 +47,9 @@ class Renderer:
         self.render(width, height, transformed_vertices.T)
         self.scene.tick()
 
+
+        if self.dump == False:
+            return
         if self.count % 5 == 0:
             self.payload.append([self.scene.vertices.copy(), transformed_vertices.T.copy()])
         self.count += 1
@@ -56,6 +63,8 @@ class Renderer:
                 w = round(ver[0])
                 h = round(ver[2])
             except OverflowError:
+                continue
+            except ValueError:
                 continue
 
             if w < 0 or w >= width:
@@ -77,6 +86,9 @@ class Renderer:
                 time.sleep(0.1)
             except KeyboardInterrupt:
                 self.scene.quit()
+
+                if not self.dump:
+                    break
                 
                 self.payload = [self.payload, self.camera_point]
 
@@ -85,8 +97,8 @@ class Renderer:
                 dump_path = Path(__file__).parents[1] / 'dumps' / 'Renderer.data'
                 with open(dump_path, mode='wb') as fp:
                     pickle.dump(self.payload, fp)
-                break
 
+                break
 
 if __name__ == '__main__':
     from scenes import Cube

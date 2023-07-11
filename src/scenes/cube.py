@@ -9,10 +9,11 @@ from src.scenes import Base
 class Cube(Base):
     def __init__(self):
         self.count = 0
+        self.dump = False
 
         w, h = get_terminal_size()
 
-        self.length = 20
+        self.length = 50
         self.start_x = round(w/2 - self.length/2)
         self.start_y = 10
         self.start_z = round(h/2 - self.length/2)
@@ -20,20 +21,32 @@ class Cube(Base):
         # honestly what the heck am i thinking
         self.center = np.array([round(x + self.length/2) for x in (self.start_x, self.start_y, self.start_z)])
 
-        self.only_draw_vertices = True
+        self.only_draw_vertices = False
+        self.only_draw_border = True
+        self.only_draw_face = True
         
 
         temp = []
+
         for x in range(self.start_x, self.start_x + self.length +1):
             for y in range(self.start_y, self.start_y + self.length +1):
                 for z in range(self.start_z, self.start_z + self.length +1):
-                    if self.only_draw_vertices:
-                        if x != self.start_x and x != self.start_x + self.length:
-                            continue
-                        if y != self.start_y and y != self.start_y + self.length:
-                            continue
-                        if z != self.start_z and z != self.start_z + self.length:
-                            continue
+                    c = 0
+                    if x == self.start_x or x == self.start_x + self.length:
+                        c += 1
+                    if y == self.start_y or y == self.start_y + self.length:
+                        c += 1
+                    if z == self.start_z or z == self.start_z + self.length:
+                        c += 1
+
+                    if self.only_draw_vertices and c < 3:
+                        continue
+
+                    if self.only_draw_border and c < 2:
+                        continue
+
+                    if self.only_draw_face and c < 1:
+                        continue
 
                     temp.append([x, y, z])
 
@@ -41,7 +54,6 @@ class Cube(Base):
         self.vertices = np.array(temp)
 
         super().__init__()
-        self.dump = True
 
     def tick(self):
         # faulty behavior to be resolved
@@ -51,23 +63,21 @@ class Cube(Base):
         c = self.count
 
 
-        self.vertices = trans.rotateZ(self.original_vertices, self.count, self.center)
-        if round(c) % 1 == 0:
-            self.payload.append(self.vertices)
-
-        # self.vertices = trans.rotateY(
-        #     trans.rotateX(self.original_vertices, self.count, self.center),
-        #     self.count,
-        #     self.center)
-
-        # vertices_2d = self.original_vertices[:, ::2].T
-        # transformed_vertices_2d = np.matmul(rot_matrix, vertices_2d)
-        # self.vertices[:, ::2] = transformed_vertices_2d.T
+        self.vertices = trans.rotateX(
+        trans.rotateY(
+            trans.rotateZ(self.original_vertices, self.count, self.center),
+            self.count,
+            self.center
+        ),
+        self.count,
+        self.center
+        )
 
         self.count += 0.1
-    
-    # def __del__(self):
-    #     import pickle
-    #     with open('./data', mode='wb') as fp:
-    #         pickle.dump(np.array(self.data), fp)
+
+        if not self.dump:
+            return
+
+        if round(c) % 1 == 0:
+            self.payload.append(self.vertices)
         
