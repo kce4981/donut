@@ -9,11 +9,14 @@ class Renderer:
     def __init__(self, scene: Base):
         self.scene = scene
         self.seq = itertools.cycle(["@", "."])
+        self.payload = []
+        self.count = 0
     
     def tick(self):
         width, height = shutil.get_terminal_size()
 
-        camera_point = np.array((round(width/2), -30, round(height/2)))
+        camera_point = np.array((round(width/2), -20, round(height/2)))
+        self.camera_point = camera_point
         vertex_vectors = self.scene.vertices - camera_point
         
         multiplier = []
@@ -40,14 +43,9 @@ class Renderer:
         self.render(width, height, transformed_vertices.T)
         self.scene.tick()
 
-
-        # char = next(self.seq)
-
-        # for _ in range(height):
-        #     print(char*width)
-        # sys.stdout.flush()
-        
-        # self.scene.tick()
+        if self.count % 5 == 0:
+            self.payload.append([self.scene.vertices.copy(), transformed_vertices.T.copy()])
+        self.count += 1
 
     def render(self, width, height, vertices):
 
@@ -77,8 +75,16 @@ class Renderer:
             try:
                 self.tick()
                 time.sleep(0.1)
-            except:
+            except KeyboardInterrupt:
                 self.scene.quit()
+                
+                self.payload = [self.payload, self.camera_point]
+
+                import pickle
+                from pathlib import Path
+                dump_path = Path(__file__).parents[1] / 'dumps' / 'Renderer.data'
+                with open(dump_path, mode='wb') as fp:
+                    pickle.dump(self.payload, fp)
                 break
 
 

@@ -12,12 +12,13 @@ class Cube(Base):
 
         w, h = get_terminal_size()
 
-        self.length = 10
-        self.start_x = round(w/2)
-        self.start_y = 50
-        self.start_z = round(h/2)
+        self.length = 20
+        self.start_x = round(w/2 - self.length/2)
+        self.start_y = 10
+        self.start_z = round(h/2 - self.length/2)
 
-        self.center = np.array([round((x + self.length)/2) for x in (self.start_x, self.start_y, self.start_z)])
+        # honestly what the heck am i thinking
+        self.center = np.array([round(x + self.length/2) for x in (self.start_x, self.start_y, self.start_z)])
 
         self.only_draw_vertices = True
         
