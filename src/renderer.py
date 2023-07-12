@@ -56,7 +56,9 @@ class Renderer:
 
     def render(self, width, height, vertices):
 
-        screen = [[" " for _ in range(width)] for _ in range(height)]
+        self.screen = [[" " for _ in range(width)] for _ in range(height)]
+        coord = []
+
 
         for ver in vertices:
             try:
@@ -67,17 +69,75 @@ class Renderer:
             except ValueError:
                 continue
 
-            if w < 0 or w >= width:
-                continue
-            if h < 0 or h >= height:
-                continue
+            coord.append((w,h))
 
-            screen[h][w] = "@"
+        for idx in range(len(coord)):
+
+            print(idx)
+
+            for edge in self.scene.edges:
+                if edge[0] != idx:
+                    continue
+                
+                ver = coord[idx]
+                ver_target = coord[edge[1]]
+
+                print(ver)
+                print(ver_target)
+
+                pos_x = ver[0]
+                pos_z = ver[1]
+
+                # z / x
+                delta_x = ver_target[0] - ver[0]
+                delta_z = ver_target[1] - ver[1]
+                distance = round((delta_x**2 + delta_z**2)**0.5)
+
+                unit = 1 if delta_x >= 0 else -1
+                
+
+                print(delta_x, delta_z, distance)
+
+                try:
+                    slope = delta_z / delta_x
+                except ZeroDivisionError:
+                    # horizontal line
+                    slope = False
+
+                print(slope)
+
+                if slope is False:
+                    for _ in range(distance):
+                        pos_z += unit
+                        self.draw(pos_x, pos_z, height, width)
+
+                    continue
+                
+                for _ in range(distance):
+                    pos_x += unit
+                    pos_z += unit * slope
+
+                    self.draw(pos_x, pos_z, width, height)
         
-        for s in screen:
+        for ver in coord:
+            self.draw(*ver, width, height)
+
+        for s in self.screen:
             print(''.join(s))
 
         sys.stdout.flush()
+
+    def draw(self, w, h, width, height):
+
+        w = round(w)
+        h = round(h)
+
+        if w < 0 or w >= width:
+            return
+        if h < 0 or h >= height:
+            return
+
+        self.screen[h][w] = "@"
 
     def run(self):
         while(True):

@@ -1,4 +1,9 @@
+import numpy as np
+
 class Base:
+    vertices: np.array
+    edges: list
+
     def __init__(self) -> None:
         self.dump = False
         self.payload = []

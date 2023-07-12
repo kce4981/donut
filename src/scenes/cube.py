@@ -8,23 +8,26 @@ from src.scenes import Base
 
 class Cube(Base):
     def __init__(self):
+        super().__init__()
         self.count = 0
-        self.dump = False
 
         w, h = get_terminal_size()
 
         self.length = 50
         self.start_x = round(w/2 - self.length/2)
-        self.start_y = 10
+        self.start_y = 20
         self.start_z = round(h/2 - self.length/2)
 
         # honestly what the heck am i thinking
         self.center = np.array([round(x + self.length/2) for x in (self.start_x, self.start_y, self.start_z)])
 
-        self.only_draw_vertices = False
+        self.only_draw_vertices = True
         self.only_draw_border = True
         self.only_draw_face = True
         
+        # self.edges = []
+        self.edges = [(0,4)]
+        # self.edges = [(0,1), (0,2), (3,1), (3,2), (4,5), (4,6), (7,5), (7,6)]
 
         temp = []
 
@@ -50,10 +53,11 @@ class Cube(Base):
 
                     temp.append([x, y, z])
 
+        print(temp)
+
         self.original_vertices = np.array(temp)
         self.vertices = np.array(temp)
 
-        super().__init__()
 
     def tick(self):
         # faulty behavior to be resolved
@@ -63,15 +67,17 @@ class Cube(Base):
         c = self.count
 
 
-        self.vertices = trans.rotateX(
-        trans.rotateY(
-            trans.rotateZ(self.original_vertices, self.count, self.center),
-            self.count,
-            self.center
-        ),
-        self.count,
-        self.center
-        )
+        # self.vertices = trans.rotateX(
+        # trans.rotateY(
+        #     trans.rotateZ(self.original_vertices, self.count, self.center),
+        #     self.count,
+        #     self.center
+        # ),
+        # self.count,
+        # self.center
+        # )
+
+        self.vertices = trans.rotateZ(self.original_vertices, self.count, self.center)
 
         self.count += 0.1
 
