@@ -1,14 +1,13 @@
 from src.renderer import Renderer
-from src.scenes import Cube
-from src.scenes import line
-from src.scenes import Tetrahedron
-from src.scenes import External
-from src.scenes import Torus
+from src.scenes import Cube, Line, Tetrahedron, External, Torus
 
-cu = Cube()
-ln = line.Line()
-tr = Tetrahedron()
-ex = External('torus', scale=10)
-to = Torus()
-rd = Renderer(to)
+Scenes = [Cube(), Line(), Tetrahedron(), Torus()]
+
+
+for i, sc in enumerate(Scenes):
+    print(f'{i+1}: {sc.__class__.__name__}')
+idx = int(input("Choose which scene to render: ")) - 1
+
+
+rd = Renderer(Scenes[idx])
 rd.run()

@@ -6,7 +6,6 @@ class Torus(External):
     def __init__(self) -> None:
         super().__init__('torus', 20)
         self.radian = 0
-        print(get_terminal_size())
 
     def tick(self) -> None:
         self.radian += 0.1
