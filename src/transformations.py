@@ -6,6 +6,13 @@ def rotate_matrix(radian) -> np.array:
         [np.sin(radian), np.cos(radian)]
     ]
 
+def scale_matrix(k, h, j) -> np.array:
+    return np.array([
+        [k, 0, 0],
+        [0, h, 0],
+        [0, 0, j]
+    ])
+
 
 def rotateX(vertices: np.array, radian: float, origin=np.array([0,0,0])) -> np.array:
 

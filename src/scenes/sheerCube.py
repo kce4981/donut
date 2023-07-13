@@ -6,7 +6,7 @@ from src import transformations as trans
 from src.scenes import Base
 
 
-class Cube(Base):
+class SheerCube(Base):
     def __init__(self):
         super().__init__()
         self.count = 0
@@ -36,31 +36,36 @@ class Cube(Base):
                     if z == self.start_z or z == self.start_z + self.length:
                         c += 1
 
+
                     if c < 3:
                         continue
-
+                    
                     temp.append([x, y, z])
 
-        self.original_vertices = np.array(temp)
         self.vertices = np.array(temp)
+        self.vertices = trans.rotateZ(self.vertices, 3.14/6, self.center)
+        self.original_vertices = self.vertices.copy()
+
+        self.d = 1
 
 
     def tick(self):
         c = self.count
 
+        mat = np.array([
+            [1,0,self.count],
+            [0,1,0],
+            [0,0,1]
+        ])
 
-        self.vertices = trans.rotateX(
-        trans.rotateY(
-            trans.rotateZ(self.original_vertices, self.count, self.center),
-            self.count,
-            self.center
-        ),
-        self.count,
-        self.center
-        )
+        self.vertices = (np.matmul(mat,(self.original_vertices - self.center).T)).T
+        self.vertices += self.center
 
-
-        self.count += 0.1
+        self.count += .1 * self.d
+        if self.count >= 3:
+            self.d = -1
+        if self.count <= -3:
+            self.d = 1
 
         if not self.dump:
             return
