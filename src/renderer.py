@@ -30,10 +30,13 @@ class Renderer:
         # needs to be fixed
         # value is inf if zeroDivision happens
         for x in range(np.shape(self.scene.vertices)[0]):
-            n = self.scene.vertices[:,1][x] 
-            d = vertex_vectors[:,1][x]
-            # print(n, d)
-            multiplier.append(n/d)
+            with np.errstate(divide='raise'):
+                try:
+                    n = self.scene.vertices[:,1][x] 
+                    d = vertex_vectors[:,1][x]
+                    multiplier.append(n/d)
+                except FloatingPointError:
+                    multiplier.append(0)
 
         # print(multiplier)
 
