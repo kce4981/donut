@@ -8,7 +8,6 @@ from src.scenes import Base
 class Renderer:
     def __init__(self, scene: Base, dump=False):
         self.scene = scene
-        self.seq = itertools.cycle(["@", "."])
         self.payload = []
         self.dump = dump
         self.count = 0
@@ -111,7 +110,10 @@ class Renderer:
 
         dx = x2 - x1
         dz = z2 - z1
-        slope = dz / dx
+        try:
+            slope = dz / dx
+        except ZeroDivisionError:
+            slope = 0
 
         z = z1
         z_direction = 1
@@ -123,7 +125,6 @@ class Renderer:
         for x in range(x1, x2+1):
 
             D += slope
-            print(D)
             if D >= 1:
                 D -= 1
                 z += z_direction
@@ -133,7 +134,10 @@ class Renderer:
     def draw_line_z(self, x1, z1, x2, z2):
         dx = x2 - x1
         dz = z2 - z1
-        slope = dx / dz
+        try:
+            slope = dx / dz
+        except ZeroDivisionError:
+            slope = 0
 
         x = x1
         x_direction = 1
