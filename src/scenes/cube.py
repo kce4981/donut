@@ -26,8 +26,7 @@ class Cube(Base):
         self.only_draw_face = True
         
         # self.edges = []
-        self.edges = [(0,4)]
-        # self.edges = [(0,1), (0,2), (3,1), (3,2), (4,5), (4,6), (7,5), (7,6)]
+        self.edges = [(0,1), (0,2), (3,1), (3,2), (4,5), (4,6), (7,5), (7,6)]
 
         temp = []
 

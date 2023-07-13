@@ -18,6 +18,8 @@ class Renderer:
     
     def tick(self):
         width, height = shutil.get_terminal_size()
+        self.width = width
+        self.height = height
 
         camera_point = np.array((round(width/2), -20, round(height/2)))
         self.camera_point = camera_point
@@ -73,8 +75,6 @@ class Renderer:
 
         for idx in range(len(coord)):
 
-            print(idx)
-
             for edge in self.scene.edges:
                 if edge[0] != idx:
                     continue
@@ -82,59 +82,80 @@ class Renderer:
                 ver = coord[idx]
                 ver_target = coord[edge[1]]
 
-                print(ver)
-                print(ver_target)
-
-                pos_x = ver[0]
-                pos_z = ver[1]
-
-                # z / x
-                delta_x = ver_target[0] - ver[0]
-                delta_z = ver_target[1] - ver[1]
-                distance = round((delta_x**2 + delta_z**2)**0.5)
-
-                unit = 1 if delta_x >= 0 else -1
-                
-
-                print(delta_x, delta_z, distance)
-
-                try:
-                    slope = delta_z / delta_x
-                except ZeroDivisionError:
-                    # horizontal line
-                    slope = False
-
-                print(slope)
-
-                if slope is False:
-                    for _ in range(distance):
-                        pos_z += unit
-                        self.draw(pos_x, pos_z, height, width)
-
-                    continue
-                
-                for _ in range(distance):
-                    pos_x += unit
-                    pos_z += unit * slope
-
-                    self.draw(pos_x, pos_z, width, height)
+                self.draw_line(*ver, *ver_target)
         
         for ver in coord:
-            self.draw(*ver, width, height)
+            self.draw_Pixel(*ver)
 
         for s in self.screen:
             print(''.join(s))
 
         sys.stdout.flush()
 
-    def draw(self, w, h, width, height):
+    def draw_line(self, x1, z1, x2, z2):
 
-        w = round(w)
-        h = round(h)
+        if abs(x2 - x1) > abs(z2 - z1):
+            if x1 > x2:
+                self.draw_line_x(x2, z2, x1, z1)
+            else:
+                self.draw_line_x(x1, z1, x2, z2)
+        else:
+            if z1 > z2:
+                self.draw_line_z(x2, z2, x1, z1)
+            else:
+                self.draw_line_z(x1, z1, x2, z2)
 
-        if w < 0 or w >= width:
+        
+
+    def draw_line_x(self, x1, z1, x2, z2):
+
+        dx = x2 - x1
+        dz = z2 - z1
+        slope = dz / dx
+
+        z = z1
+        z_direction = 1
+        if dz < 0:
+            z_direction = -1
+            slope *= -1
+        D = 0.5
+
+        for x in range(x1, x2+1):
+
+            D += slope
+            print(D)
+            if D >= 1:
+                D -= 1
+                z += z_direction
+
+            self.draw_Pixel(x, z)
+
+    def draw_line_z(self, x1, z1, x2, z2):
+        dx = x2 - x1
+        dz = z2 - z1
+        slope = dx / dz
+
+        x = x1
+        x_direction = 1
+        if dx < 0:
+            x_direction = -1
+            slope *= -1
+        D = 0.5
+
+        for z in range(z1, z2+1):
+
+            D += slope
+            if D >= 1:
+                D -= 1
+                x += x_direction
+
+            self.draw_Pixel(x, z)
+
+    def draw_Pixel(self, w: int, h: int):
+
+        if w < 0 or w >= self.width:
             return
-        if h < 0 or h >= height:
+        if h < 0 or h >= self.height:
             return
 
         self.screen[h][w] = "@"
