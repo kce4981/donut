@@ -9,5 +9,6 @@ for i, sc in enumerate(Scenes):
 idx = int(input("Choose which scene to render: ")) - 1
 
 
-rd = Renderer(Scenes[idx], dump=True)
+# rd = Renderer(Scenes[idx], dump=True)
+rd = Renderer(Scenes[idx])
 rd.run()
